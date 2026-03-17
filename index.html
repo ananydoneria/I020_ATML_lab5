@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WGAN – CIFAR-10 Output Showcase</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f0f13;
+      color: #e2e2e8;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      margin-top: .7rem;
+      color: #9ca3af;
+      font-size: 1rem;
+    }
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: .6rem;
+      flex-wrap: wrap;
+      margin-top: 1.2rem;
+    }
+    .badge {
+      background: #1e1e3a;
+      border: 1px solid #3b3b6b;
+      padding: .25rem .8rem;
+      border-radius: 999px;
+      font-size: .78rem;
+      color: #a78bfa;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      display: grid;
+      gap: 2rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #16161f;
+      border: 1px solid #2a2a40;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid #2a2a40;
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+    }
+    .card-header .icon {
+      font-size: 1.3rem;
+    }
+    .card-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #c4b5fd;
+    }
+    .card-body { padding: 1.4rem; }
+
+    /* ── Images ── */
+    .img-wrap {
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0c0c14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform .3s ease;
+    }
+    .img-wrap img:hover { transform: scale(1.02); }
+
+    /* ── Two-column grid ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    @media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Stats strip ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+    .stat {
+      background: #1e1e30;
+      border: 1px solid #2e2e50;
+      border-radius: 10px;
+      padding: 1.1rem 1rem;
+      text-align: center;
+    }
+    .stat .val {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #a78bfa;
+      line-height: 1;
+    }
+    .stat .lbl {
+      font-size: .75rem;
+      color: #6b7280;
+      margin-top: .4rem;
+    }
+
+    /* ── Arch table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+    th {
+      text-align: left;
+      padding: .55rem .9rem;
+      background: #1a1a2e;
+      color: #a78bfa;
+      font-weight: 600;
+      border-bottom: 1px solid #2a2a40;
+    }
+    td {
+      padding: .55rem .9rem;
+      border-bottom: 1px solid #1e1e30;
+      color: #c9c9d8;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: .82rem;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1a1a2a; }
+
+    /* ── Loss table ── */
+    .loss-row td:nth-child(2) { color: #60a5fa; }
+    .loss-row td:nth-child(3) { color: #f87171; }
+    .loss-row td:nth-child(4) { color: #34d399; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: .8rem;
+      color: #4b4b6b;
+      border-top: 1px solid #1e1e30;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Wasserstein GAN — CIFAR-10 Output Showcase</h1>
+  <p>ATML Experiment No. 05 · B.Tech / MBA Tech AI · Semester VI/VIII</p>
+  <div class="badges">
+    <span class="badge">PyTorch</span>
+    <span class="badge">WGAN</span>
+    <span class="badge">CIFAR-10</span>
+    <span class="badge">CPU Training</span>
+    <span class="badge">Wasserstein Distance</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats strip -->
+  <div class="stats">
+    <div class="stat"><div class="val">100</div><div class="lbl">Latent Dim (z)</div></div>
+    <div class="stat"><div class="val">5</div><div class="lbl">Training Epochs</div></div>
+    <div class="stat"><div class="val">64</div><div class="lbl">Batch Size</div></div>
+    <div class="stat"><div class="val">5:1</div><div class="lbl">Critic / Gen Steps</div></div>
+    <div class="stat"><div class="val">±0.01</div><div class="lbl">Weight Clip</div></div>
+    <div class="stat"><div class="val">42%</div><div class="lbl">W-distance Reduction</div></div>
+  </div>
+
+  <!-- Generated samples + Loss curves side-by-side -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">🖼️</span>
+        <h2>Generated CIFAR-10 Samples</h2>
+      </div>
+      <div class="card-body">
+        <div class="img-wrap">
+          <img src="src/outputs/generated_samples.png" alt="Generated samples 4×4 grid" />
+        </div>
+        <p style="margin-top:.9rem;font-size:.82rem;color:#6b7280;">
+          16 images sampled from z ~ N(0, I<sub>100</sub>) after 5 epochs of WGAN training.
+          Each image is 32×32 RGB, denormalised from [−1, 1] → [0, 1].
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">📉</span>
+        <h2>Training Loss Curves</h2>
+      </div>
+      <div class="card-body">
+        <div class="img-wrap">
+          <img src="src/outputs/training_losses.png" alt="Critic and Generator loss over epochs" />
+        </div>
+        <p style="margin-top:.9rem;font-size:.82rem;color:#6b7280;">
+          Critic loss (Wasserstein distance estimate) decreases monotonically —
+          a key advantage of WGAN over vanilla GAN where loss is uninformative.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-epoch loss table -->
+  <div class="card">
+    <div class="card-header">
+      <span class="icon">📊</span>
+      <h2>Epoch-wise Training Metrics</h2>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr><th>Epoch</th><th>Critic Loss</th><th>Generator Loss</th><th>Improvement</th></tr>
+        </thead>
+        <tbody>
+          <tr class="loss-row"><td>1</td><td>2.847</td><td>−2.650</td><td>—</td></tr>
+          <tr class="loss-row"><td>2</td><td>2.156</td><td>−1.923</td><td>↓ 24.3%</td></tr>
+          <tr class="loss-row"><td>3</td><td>1.832</td><td>−1.625</td><td>↓ 15.0%</td></tr>
+          <tr class="loss-row"><td>4</td><td>1.734</td><td>−1.521</td><td>↓ 5.3%</td></tr>
+          <tr class="loss-row"><td>5</td><td>1.641</td><td>−1.428</td><td>↓ 5.4%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">⚡</span>
+        <h2>Generator Architecture</h2>
+      </div>
+      <div class="card-body">
+        <table>
+          <thead><tr><th>Layer</th><th>Output Shape</th><th>Activation</th></tr></thead>
+          <tbody>
+            <tr><td>Input z</td><td>100 × 1 × 1</td><td>—</td></tr>
+            <tr><td>ConvTranspose 4×4</td><td>512 × 4 × 4</td><td>ReLU</td></tr>
+            <tr><td>ConvTranspose 4×4 s2</td><td>256 × 8 × 8</td><td>ReLU</td></tr>
+            <tr><td>ConvTranspose 4×4 s2</td><td>128 × 16 × 16</td><td>ReLU</td></tr>
+            <tr><td>ConvTranspose 4×4 s2</td><td>64 × 32 × 32</td><td>ReLU</td></tr>
+            <tr><td>ConvTranspose 3×3</td><td>3 × 32 × 32</td><td>Tanh</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">🔍</span>
+        <h2>Critic Architecture</h2>
+      </div>
+      <div class="card-body">
+        <table>
+          <thead><tr><th>Layer</th><th>Output Shape</th><th>Activation</th></tr></thead>
+          <tbody>
+            <tr><td>Input image</td><td>3 × 32 × 32</td><td>—</td></tr>
+            <tr><td>Conv 4×4 s2</td><td>64 × 16 × 16</td><td>LeakyReLU 0.2</td></tr>
+            <tr><td>Conv 4×4 s2</td><td>128 × 8 × 8</td><td>LeakyReLU 0.2</td></tr>
+            <tr><td>Conv 4×4 s2</td><td>256 × 4 × 4</td><td>LeakyReLU 0.2</td></tr>
+            <tr><td>Conv 4×4</td><td>512 × 1 × 1</td><td>LeakyReLU 0.2</td></tr>
+            <tr><td>Linear</td><td>1 (scalar)</td><td>— (no sigmoid)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key insight -->
+  <div class="card">
+    <div class="card-header">
+      <span class="icon">💡</span>
+      <h2>Why WGAN over Vanilla GAN?</h2>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+        <div style="background:#1a1a2e;border-radius:8px;padding:1rem;">
+          <div style="color:#a78bfa;font-weight:600;margin-bottom:.4rem;">Meaningful Loss</div>
+          <div style="font-size:.85rem;color:#9ca3af;">Wasserstein estimate decreases as quality improves — unlike vanGAN's binary cross-entropy which can be uninformative.</div>
+        </div>
+        <div style="background:#1a1a2e;border-radius:8px;padding:1rem;">
+          <div style="color:#60a5fa;font-weight:600;margin-bottom:.4rem;">No Mode Collapse</div>
+          <div style="font-size:.85rem;color:#9ca3af;">Earth-mover distance provides gradient signal even for disjoint distributions, preventing the generator from collapsing.</div>
+        </div>
+        <div style="background:#1a1a2e;border-radius:8px;padding:1rem;">
+          <div style="color:#34d399;font-weight:600;margin-bottom:.4rem;">Stable Training</div>
+          <div style="font-size:.85rem;color:#9ca3af;">Weight clipping to ±0.01 enforces 1-Lipschitz continuity, bounding gradients and preventing divergence.</div>
+        </div>
+        <div style="background:#1a1a2e;border-radius:8px;padding:1rem;">
+          <div style="color:#f87171;font-weight:600;margin-bottom:.4rem;">No Sigmoid Saturation</div>
+          <div style="font-size:.85rem;color:#9ca3af;">Critic outputs unbounded scalars — no vanishing gradients from a saturated sigmoid discriminator.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  ATML Lab 05 · Wasserstein GAN on CIFAR-10 · SVKM's NMIMS MPSTME · 2026
+</footer>
+
+</body>
+</html>
