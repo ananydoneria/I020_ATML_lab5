@@ -1,0 +1,6 @@
+data/
+*.tar.gz
+__pycache__/
+*.pyc
+training_output*.log
+training_output*.txt
