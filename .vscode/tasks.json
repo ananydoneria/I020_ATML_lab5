@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Lab05: Check required deliverables",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "set -e; missing=0; for f in answers/task1_answers.md src/train_wgan_cifar.py reports/task2_results.md reports/partb_submission.md; do if [ ! -f \"$f\" ]; then echo \"MISSING: $f\"; missing=1; else echo \"OK: $f\"; fi; done; if [ \"$missing\" -eq 1 ]; then echo \"\\nStatus: Incomplete deliverables.\"; exit 1; else echo \"\\nStatus: All required deliverables found.\"; fi"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Lab05: Run WGAN training (CIFAR)",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "src/train_wgan_cifar.py"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}
